@@ -54,6 +54,39 @@ pub fn install(targets: &[String], rua_paths: &RuaPaths, is_offline: bool, asdep
 		is_offline,
 		asdeps,
 	);
+
+	// ~/.cache/rua/build/foo-bar-package/
+	// rua_paths.global_build_dir
+	println!("{:?}", targets);
+	println!("{:?}", rua_paths);
+	for target in targets {
+		println!(
+			"{:?}",
+			rua_paths
+				.global_build_dir
+				.as_path()
+				.to_str()
+				.unwrap()
+				.to_owned() + "/"
+				+ target
+		);
+		let bla = rua_paths
+			.global_build_dir
+			.as_path()
+			.to_str()
+			.unwrap()
+			.to_owned() + "/"
+			+ target;
+
+		let res = fs::remove_dir_all(bla.to_owned());
+		match res {
+			Ok(()) => (),
+			Err(error) => println!(
+				"Warning, could not delete temp folder ({}). Reason: {:?}",
+				bla, error
+			),
+		}
+	}
 }
 
 fn show_install_summary(pacman_deps: &IndexSet<String>, aur_packages: &IndexMap<String, i32>) {
