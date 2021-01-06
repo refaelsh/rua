@@ -45,7 +45,7 @@ mod tests {
 	use std::path::PathBuf;
 
 	#[test]
-	fn bla() {
+	fn delete_folders_test() {
 		let mut mock_folder_deleter = Box::new(MockIFolderDeleter::new());
 
 		mock_folder_deleter
@@ -61,7 +61,6 @@ mod tests {
 
 		let left_overs_deleter = LeftOversDeleter::new(mock_folder_deleter);
 
-		// let bla = left_overs_deleter.m_folder_deleter;
 		let targets = ["some_target".to_string()];
 		let rua_paths = RuaPaths::initialize_paths();
 
