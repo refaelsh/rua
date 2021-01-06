@@ -1,4 +1,6 @@
 use crate::aur_rpc_utils;
+use crate::folder_deleter::FolderDeleter;
+use crate::left_overs_deleter::LeftOversDeleter;
 use crate::pacman;
 use crate::reviewing;
 use crate::rua_paths::RuaPaths;
@@ -55,38 +57,9 @@ pub fn install(targets: &[String], rua_paths: &RuaPaths, is_offline: bool, asdep
 		asdeps,
 	);
 
-	// ~/.cache/rua/build/foo-bar-package/
-	// rua_paths.global_build_dir
-	println!("{:?}", targets);
-	println!("{:?}", rua_paths);
-	for target in targets {
-		println!(
-			"{:?}",
-			rua_paths
-				.global_build_dir
-				.as_path()
-				.to_str()
-				.unwrap()
-				.to_owned() + "/"
-				+ target
-		);
-		let bla = rua_paths
-			.global_build_dir
-			.as_path()
-			.to_str()
-			.unwrap()
-			.to_owned() + "/"
-			+ target;
-
-		let res = fs::remove_dir_all(bla.to_owned());
-		match res {
-			Ok(()) => (),
-			Err(error) => println!(
-				"Warning, could not delete temp folder ({}). Reason: {:?}",
-				bla, error
-			),
-		}
-	}
+	let folder_deleter = Box::new(FolderDeleter::new());
+	let left_overs_deleter = LeftOversDeleter::new(folder_deleter);
+	left_overs_deleter.delete_folders(targets, rua_paths);
 }
 
 fn show_install_summary(pacman_deps: &IndexSet<String>, aur_packages: &IndexMap<String, i32>) {
